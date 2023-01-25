@@ -15,7 +15,7 @@ file, err := m.GetFile(r, "image.png")
 ```
 
 ```go
-res, err := m.Upload(file, "http://google.com", "image.png")
+res, err := m.Upload(file, "http://google.com", "image.png", "image")
 ```
 
 

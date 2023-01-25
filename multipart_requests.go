@@ -29,7 +29,7 @@ func (m *MultipartRequest) GetFile(r *http.Request, name string) (*string, error
 }
 
 // Upload Uploads a local file via an http request as multipart formdata.
-func (m *MultipartRequest) Upload(file multipart.File, url, filename string) (*http.Response, error) {
+func (m *MultipartRequest) Upload(file multipart.File, url, filename, field string) (*http.Response, error) {
 	// create dir if not exist
 	err := os.Mkdir("temp", 0755)
 	if err != nil {
@@ -54,7 +54,7 @@ func (m *MultipartRequest) Upload(file multipart.File, url, filename string) (*h
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, _ := writer.CreateFormFile("logo", filename)
+	part, _ := writer.CreateFormFile(field, filename)
 	if _, err = io.Copy(part, tempFile); err != nil {
 		return nil, err
 	}
