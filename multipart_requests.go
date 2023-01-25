@@ -33,7 +33,7 @@ func (m *MultipartRequest) GetFile(r *http.Request, name string) (*string, multi
 	return &handler.Filename, file, nil
 }
 
-// Upload Uploads a local file via an http request as multipart formdata.
+// Upload a local file via an http request as multipart formdata.
 func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (*http.Response, error) {
 	var err error
 	if m.Url == "" {
