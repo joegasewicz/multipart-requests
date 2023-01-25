@@ -50,18 +50,17 @@ func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (
 		}
 	}
 
-	// Create file
 	filePath := fmt.Sprintf("%s/%s", m.TempPath, filename)
 	dst, err := os.Create(filePath)
 	defer dst.Close()
 	if err != nil {
 		return nil, err
 	}
-	// Copy file over
+
 	if _, err := io.Copy(dst, file); err != nil {
 		return nil, err
 	}
-	// upload file
+
 	tempFile, _ := os.Open(filePath)
 	defer file.Close()
 
@@ -87,7 +86,7 @@ func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (
 	if err != nil {
 		return res, nil
 	}
-	// Clean up
+
 	if !m.Persist {
 		if err = os.RemoveAll(m.TempPath); err != nil {
 			return res, err
