@@ -2,6 +2,7 @@ package multipart_requests
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -16,29 +17,42 @@ type MultipartRequest struct {
 	TempPath string
 	// Whether to persist files to the server. By default, files will be removed
 	Persist bool
+	// Set to true to get error logs. Default is false
+	Debug bool
+	// The request url
+	Url string
 }
 
 // GetFile Gets the file from an incoming form request
-func (m *MultipartRequest) GetFile(r *http.Request, name string) (*string, error) {
+func (m *MultipartRequest) GetFile(r *http.Request, name string) (*string, multipart.File, error) {
 	file, handler, err := r.FormFile(name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	defer file.Close()
-	return &handler.Filename, nil
+	//defer file.Close()
+	return &handler.Filename, file, nil
 }
 
 // Upload Uploads a local file via an http request as multipart formdata.
-func (m *MultipartRequest) Upload(file multipart.File, url, filename, field string) (*http.Response, error) {
+func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (*http.Response, error) {
+	var err error
+	if m.Url == "" {
+		panic("You must provide a Url value")
+	}
+	if m.TempPath == "" {
+		m.TempPath = "temp"
+	}
 	// create dir if not exist
-	err := os.Mkdir("temp", 0755)
+	err = os.Mkdir("temp", 0755)
 	if err != nil {
-		log.Printf("Error %s", err.Error())
-		return nil, err
+		if m.Debug {
+			log.Printf("Error creating temprary file: %s", err.Error())
+		}
 	}
 
 	// Create file
-	dst, err := os.Create("temp/" + filename)
+	filePath := fmt.Sprintf("%s/%s", m.TempPath, filename)
+	dst, err := os.Create(filePath)
 	defer dst.Close()
 	if err != nil {
 		return nil, err
@@ -48,7 +62,6 @@ func (m *MultipartRequest) Upload(file multipart.File, url, filename, field stri
 		return nil, err
 	}
 	// upload file
-	filePath := "temp/" + filename
 	tempFile, _ := os.Open(filePath)
 	defer file.Close()
 
@@ -64,7 +77,7 @@ func (m *MultipartRequest) Upload(file multipart.File, url, filename, field stri
 
 	req, _ := http.NewRequest(
 		DEFAULT_METHOD,
-		url,
+		m.Url,
 		body,
 	)
 
