@@ -29,7 +29,6 @@ func (m *MultipartRequest) GetFile(r *http.Request, name string) (*string, multi
 	if err != nil {
 		return nil, nil, err
 	}
-	//defer file.Close()
 	return &handler.Filename, file, nil
 }
 
@@ -42,7 +41,7 @@ func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (
 	if m.TempPath == "" {
 		m.TempPath = "temp"
 	}
-	// create dir if not exist
+
 	err = os.Mkdir("temp", 0755)
 	if err != nil {
 		if m.Debug {
