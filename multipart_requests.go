@@ -83,7 +83,7 @@ func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return res, nil
+		return res, err
 	}
 
 	if !m.Persist {
