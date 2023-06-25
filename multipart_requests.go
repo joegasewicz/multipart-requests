@@ -78,8 +78,7 @@ func (m *MultipartRequest) Upload(file multipart.File, filename, field string) (
 		m.Url,
 		body,
 	)
-
-	req.Header.Add("Content-Type", "multipart/form-data")
+	req.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
